@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="brand/nwh-mark-white.png">
+<meta property="og:title" content="Keyspan">
+<meta property="og:description" content="Resident at Sound + Spotlight. Selected shows, recordings, releases, booking.">
+<meta property="og:image" content="https://keyspan.org/brand/nwh-rotate-poster.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Keyspan EPK</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Keyspan. Resident at Sound + Spotlight. Selected shows, recordings, releases, booking.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  /* Layout: a terminal printout. One column, all lowercase, one monospace face, black and white.
+     Scanlines and a slow rolling band over everything; the wordmark tears now and then like a bad signal. */
+  :root {
+    --ground: #000000;
+    --ink: #ffffff;
+    --ink-muted: #a3a3a3;
+    --line: #333333;
+    --scan: rgba(255, 255, 255, 0.035);
+    --band: rgba(255, 255, 255, 0.05);
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --glyph: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    --size: 14px;
+    --lh: 1.6;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 var(--size)/var(--lh) var(--mono);
+    text-transform: lowercase;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--ink); color: var(--ground); }
+
+  /* transmission: static scanlines plus one faint band rolling down the screen */
+  body::before, body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  body::before { background: repeating-linear-gradient(to bottom, var(--scan) 0 1px, transparent 1px 3px); }
+  body::after {
+    background: linear-gradient(to bottom, transparent 0, var(--band) 50%, transparent 100%);
+    height: 18vh;
+    inset: auto 0 auto 0;
+    top: -20vh;
+    animation: roll 9s linear infinite;
+  }
+  @keyframes roll { to { transform: translateY(140vh); } }
+
+  .page {
+    max-width: 88ch;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 56px 48px;
+    display: grid;
+    gap: 64px;
+  }
+
+  a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { background: var(--ink); color: var(--ground); text-decoration: none; }
+  a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .muted { color: var(--ink-muted); }
+  .g { font-family: var(--glyph); color: var(--ink-muted); }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* header */
+  header { display: grid; gap: 24px; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .wm { position: relative; flex: 1 1 auto; min-width: 0; max-width: 520px; }
+  .wm img { display: block; width: 100%; height: auto; }
+  .wm .slice { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  .orbit { flex: 0 0 auto; display: block; line-height: 0; }
+  .orbit:hover { background: none; }
+  .orbit video, .orbit img { display: block; width: 112px; height: 64px; object-fit: cover; background: var(--ground); }
+
+  .kv { display: grid; }
+  .kv p { margin: 0; display: grid; grid-template-columns: 9ch 2ch 1fr; }
+  .kv .k, .kv .sep { color: var(--ink-muted); }
+  .kv .v { min-width: 0; overflow-wrap: anywhere; display: flex; flex-wrap: wrap; gap: 0 2ch; align-items: baseline; }
+
+  /* sections */
+  section { display: grid; gap: 14px; }
+  h2 {
+    margin: 0;
+    font: 600 var(--size)/var(--lh) var(--mono);
+    letter-spacing: 0.12em;
+    display: flex;
+    gap: 1.2ch;
+    align-items: center;
+    cursor: default;
+  }
+  h2 .g { letter-spacing: 0; font-weight: 400; }
+  h2 .under { animation: blink 1.05s steps(1) infinite; color: var(--ink-muted); margin-left: -1.2ch; letter-spacing: 0; }
+  h2::after { content: ""; flex: 1; border-top: 1px dashed var(--line); margin-left: 1ch; }
+
+  /* plain-text tables: fixed character columns so headers and rows line up, one line per row */
+  .list { display: grid; font-variant-numeric: tabular-nums; }
+  .row {
+    display: grid;
+    grid-template-columns: 9ch 30ch minmax(0, 1fr);
+    column-gap: 2ch;
+  }
+  .row > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .head { color: var(--ink-muted); padding-bottom: 4px; margin-bottom: 6px; border-bottom: 1px dashed var(--line); }
+  .year { color: var(--ink-muted); padding-top: 1.1em; cursor: default; }
+  .head + .year { padding-top: 0.2em; }
+  .row.key { font-weight: 600; }
+  .rec { font-weight: 600; }
+  .bracket { font-weight: 600; color: var(--ink); }
+
+  .releases .row { grid-template-columns: 5ch 42ch minmax(0, 1fr); }
+
+  footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 8px; }
+  footer a { display: inline-block; line-height: 0; padding: 4px; }
+  footer img { height: 18px; width: auto; display: block; }
+  footer a:hover { background: none; opacity: 0.6; }
+  footer .g { font-size: 12px; letter-spacing: 0.2em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after, h2 .under { animation: none; }
+    body::after { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    :root { --size: 12px; }
+    .page { padding-block: 28px 40px; gap: 52px; }
+    .orbit video, .orbit img { width: 84px; height: 48px; }
+    .row { grid-template-columns: 8ch minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 1.5ch; }
+    .releases .row { grid-template-columns: 4ch minmax(0, 1.6fr) minmax(0, 1fr); }
+    .kv p { grid-template-columns: 8ch 2ch 1fr; }
+  }
+</style>
+
+<div class="page">
+
+  <header>
+    <div class="top">
+      <div class="wm" id="wm">
+        <img src="brand/keyspan-wordmark-white.svg" alt="Keyspan" width="1610" height="143">
+        <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
+        <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
+      </div>
+      <a class="orbit" href="https://www.instagram.com/near.wild.heaven_/" target="_blank" rel="noopener" title="Near Wild Heaven">
+        <video id="orbit" muted loop playsinline autoplay preload="none" poster="brand/nwh-rotate-poster.png" aria-label="Near Wild Heaven" width="112" height="64"></video>
+      </a>
+    </div>
+    <div class="kv">
+      <p><span class="k">listen</span><span class="sep">|</span><span class="v"><a href="https://www.instagram.com/keyspan_/" target="_blank" rel="noopener">ig</a><a href="https://open.spotify.com/artist/3Q4CXWHBChhLfoBxYj80tL" target="_blank" rel="noopener">spotify</a><a href="https://soundcloud.com/keyspan" target="_blank" rel="noopener">soundcloud</a></span></p>
+      <p><span class="k">resident</span><span class="sep">|</span><span class="v"><a href="https://www.instagram.com/sound_nightclub/" target="_blank" rel="noopener">sound</a><span class="muted">+</span><a href="https://www.instagram.com/spotlight.la/" target="_blank" rel="noopener">spotlight</a></span></p>
+      <p><span class="k">imprint</span><span class="sep">|</span><span class="v"><a href="https://www.instagram.com/near.wild.heaven_/" target="_blank" rel="noopener">near wild heaven</a></span></p>
+      <p><span class="k">booking</span><span class="sep">|</span><span class="v"><a class="mail" data-u="team" data-d="nearwildheaven.org" href="#contact">team [at] nearwildheaven [dot] org</a></span></p>
+    </div>
+  </header>
+
+  <section id="shows">
+    <h2><span class="g" aria-hidden="true">&#10022;</span><span data-scramble>selected past shows</span><span class="under" aria-hidden="true">_</span></h2>
+    <div class="list" id="show-list"></div>
+  </section>
+
+  <section id="releases">
+    <h2><span class="g" aria-hidden="true">&#8756;</span><span data-scramble>releases</span><span class="under" aria-hidden="true">_</span></h2>
+    <div class="list releases">
+      <div class="row head"><span>year</span><span>title</span><span>label</span></div>
+      <div class="row"><span>2024</span><span><a href="https://open.spotify.com/album/5bZuH5CXaFSw0oSwfA2K59" target="_blank" rel="noopener">vaayu ep</a></span><span>near wild heaven</span></div>
+      <div class="row"><span>2023</span><span><a href="https://open.spotify.com/track/7IgPjlDHJbdGrHPecaJTk2" target="_blank" rel="noopener">minus the light - r&amp;j (keyspan remix)</a></span><span>minus the light</span></div>
+      <div class="row"><span>2022</span><span><a href="https://open.spotify.com/album/4nADjB23WH1Hs7ZTV3UDCt" target="_blank" rel="noopener">trinity remixes by etari &amp; danny goliger</a></span><span>lots of practice</span></div>
+      <div class="row"><span>2022</span><span><a href="https://open.spotify.com/track/7svMqQNkcRVUinF9HvPx4n" target="_blank" rel="noopener">hannah monica &amp; keyspan - trinity</a></span><span>lots of practice</span></div>
+      <div class="row"><span>2020</span><span><a href="https://open.spotify.com/track/1ysEbBJw3p19PJTAc3vdE1" target="_blank" rel="noopener">awaken - the longing (keyspan remix)</a></span><span>puzl records</span></div>
+      <div class="row"><span>2018</span><span><a href="https://open.spotify.com/track/0k4Ars30qRaKr9u8Ca29Y3" target="_blank" rel="noopener">as within</a></span><span>lamp</span></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2><span class="g" aria-hidden="true">&#9623;&#9627;</span><span data-scramble>contact</span><span class="under" aria-hidden="true">_</span></h2>
+    <div class="kv">
+      <p><span class="k">booking</span><span class="sep">|</span><span class="v"><a class="mail" data-u="team" data-d="nearwildheaven.org" href="#contact">team [at] nearwildheaven [dot] org</a></span></p>
+      <p><span class="k">listen</span><span class="sep">|</span><span class="v"><a href="https://www.instagram.com/keyspan_/" target="_blank" rel="noopener">ig</a><a href="https://open.spotify.com/artist/3Q4CXWHBChhLfoBxYj80tL" target="_blank" rel="noopener">spotify</a><a href="https://soundcloud.com/keyspan" target="_blank" rel="noopener">soundcloud</a></span></p>
+    </div>
+  </section>
+
+  <footer>
+    <a href="https://www.instagram.com/near.wild.heaven_/" target="_blank" rel="noopener" title="Near Wild Heaven"><img src="brand/nwh-mark-white.png" alt="Near Wild Heaven" width="549" height="482"></a>
+    <span class="g" aria-hidden="true">&#8961; &#8756; &#10209; &#9618;&#9617;</span>
+  </footer>
+
+</div>
+
+<script>
+  const SC = "https://soundcloud.com/keyspan/";
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // [date, event, venue, recording url, key show?]
+  // Square brackets in the event name mark it as a description, not an artist.
+  const SHOWS = [
+    ["09.18.21", "Mark Farina", "1720"],
+    ["10.08.21", "Simon Doty", "Sound"],
+    ["10.22.21", "kryptogram", "The Rose Room"],
+    ["10.30.21", "Tiga", "Sound", SC + "dmo-keyspan-sound-tiga"],
+    ["01.08.22", "Illyus & Barrientos", "Sound"],
+    ["03.25.22", "Anna Lunoe", "Sound", SC + "anna"],
+    ["05.07.22", "DJ Seinfeld", "Sound", SC + "seinfeld"],
+    ["06.09.22", "Fort Romeau", "IT by Framework @ WeHo Edition"],
+    ["06.11.22", "Yotto & Amtrac", "Splash House - Palm Springs Air Museum"],
+    ["07.22.22", "Eli & Fur", "Sound"],
+    ["08.14.22", "Splash House", "Renaissance Stage"],
+    ["10.21.22", "Paul Woolford", "Sound", SC + "woolford"],
+    ["12.28.22", "Maxinne", "Clinic", SC + "maxinne"],
+    ["02.24.23", "Simon Doty", "Sound"],
+    ["03.24.23", "Jeremy Olander", "Sound"],
+    ["04.15.23", "Camelphat B2B Carlita", "Framework in the Desert"],
+    ["05.20.23", "Louie Vega & Miguel Migs", "Minimal Effort at The Fox Hollywood"],
+    ["07.15.23", "DJ Tennis B2B Carlita", "Sound"],
+    ["08.11.23", "Odesza", "Splash House - Palm Springs Air Museum", SC + "odesza"],
+    ["11.17.23", "Rodriguez Jr.", "Sound", SC + "rjr"],
+    ["12.02.23", "Joy Anonymous", "The Roxy"],
+    ["03.23.24", "Dusky", "Sound"],
+    ["04.12.24", "Coachella - Yuma Tent", "Coachella Valley Music & Arts Festival", "", true],
+    ["04.14.24", "Surf Club / Goldenvoice", "Palm Springs Surf Club"],
+    ["04.19.24", "Coachella - Yuma Tent", "Coachella Valley Music & Arts Festival", "", true],
+    ["06.14.24", "Grum", "Spotlight"],
+    ["06.20.24", "Yotto", "Spotlight"],
+    ["11.22.24", "Laurence Guy", "Spotlight"],
+    ["01.24.25", "Chris Luno", "Sound", SC + "luno"],
+    ["05.30.25", "Knowhere Festival ft. Diplo", "Deloro Valley"],
+    ["06.21.25", "Snakehips", "Minimal Effort"],
+    ["07.25.25", "Durante", "Sound"],
+    ["09.13.25", "kryptogram", "Sound"],
+    ["11.22.25", "Amtrac", "Spotlight"],
+    ["04.14.26", "Mild Minds", "Spotlight"],
+    ["06.12.26", "Jeremy Olander", "Sable"],
+    ["06.13.26", "[3hr Vinyl Set]", "Sable Miami"],
+    ["06.25.26", "Cri", "Sound"],
+    ["06.26.26", "Knowhere Festival ft. Noizu", "Deloro Valley"],
+    ["07.18.26", "[Keyspan Open To Close]", "Lunatic Beach Club, Croatia"],
+    ["08.01.26", "Solardo", "Sound"],
+    ["08.08.26", "Phantoms", "Level 8", "https://www.youtube.com/watch?v=MBQxk-b4J4M&t=88s"],
+    ["08.14.26", "Keys, Steele, & Cash", "Ace Hotel Palm Springs"],
+    ["09.04.26", "Classixx", "Spotlight"],
+  ];
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const toDate = s => { const [m, d, y] = s.split(".").map(Number); return new Date(2000 + y, m - 1, d); };
+  const name = s => {
+    const e = esc(s);
+    return /^\[.*\]$/.test(s) ? `<span class="bracket">[</span>${e.slice(1, -1)}<span class="bracket">]</span>` : e;
+  };
+
+  const rows = SHOWS.map(([date, who, venue, rec, key]) => ({ date, who, venue, rec, key, when: toDate(date), year: 2000 + Number(date.slice(-2)) }))
+    .sort((a, b) => b.when - a.when);
+
+  let html = '<div class="row head"><span>date</span><span>event</span><span>venue</span></div>';
+  let year = null;
+  for (const r of rows) {
+    if (r.year !== year) {
+      year = r.year;
+      html += `<div class="year"><span data-scramble>▒░ ${year}</span></div>`;
+    }
+    const cls = r.key ? "row key" : "row";
+    const who = name(r.who) + (r.rec ? ` <a class="rec" href="${esc(r.rec)}" target="_blank" rel="noopener">[recording]</a>` : "");
+    html += `<div class="${cls}"><span>${r.date}</span><span title="${esc((r.who + (r.rec ? " [recording]" : "")).toLowerCase())}">${who}</span><span title="${esc(r.venue.toLowerCase())}">${esc(r.venue)}</span></div>`;
+  }
+  document.getElementById("show-list").innerHTML = html;
+
+  // email: assembled here so the address never sits in the page source for scrapers
+  for (const a of document.querySelectorAll("a.mail")) {
+    const addr = `${a.dataset.u}@${a.dataset.d}`;
+    a.href = "mailto:" + addr;
+    a.textContent = addr;
+  }
+
+  // headings and year markers decode from glyph noise: on load, on hover, and now and then on their own
+  const NOISE = "░▒▓█▀▄▌▐▖▗▘▝▚▞⌂≡§¶∆∴⌐¬✦⌁";
+  const scramble = el => {
+    if (still || el.dataset.busy) return;
+    el.dataset.busy = "1";
+    const final = el.dataset.text || (el.dataset.text = el.textContent);
+    let frame = 0;
+    const total = 16;
+    const tick = () => {
+      frame++;
+      const solid = Math.floor((frame / total) * final.length);
+      el.textContent = [...final].map((ch, i) => i < solid || ch === " " ? ch : NOISE[Math.floor(Math.random() * NOISE.length)]).join("");
+      if (frame < total) setTimeout(tick, 30);
+      else { el.textContent = final; delete el.dataset.busy; }
+    };
+    tick();
+  };
+  const scrambles = [...document.querySelectorAll("[data-scramble]")];
+  for (const el of document.querySelectorAll("h2 [data-scramble]")) scramble(el);
+  for (const el of scrambles) (el.closest("h2, .year") || el).addEventListener("mouseenter", () => scramble(el));
+
+  // bad-signal tear on the wordmark: two slices jump sideways for a moment
+  const wm = document.getElementById("wm");
+  const [base, s1, s2] = wm.querySelectorAll("img");
+  const tear = () => {
+    const band = () => { const a = Math.random() * 70; return `inset(${a}% 0 ${Math.max(0, 100 - a - (8 + Math.random() * 22))}% 0)`; };
+    let n = 0;
+    const step = () => {
+      for (const s of [s1, s2]) {
+        s.style.clipPath = band();
+        s.style.transform = `translateX(${(Math.random() - 0.5) * 28}px)`;
+        s.style.opacity = "1";
+      }
+      base.style.transform = `translateX(${(Math.random() - 0.5) * 6}px)`;
+      if (++n < 5) setTimeout(step, 50 + Math.random() * 60);
+      else setTimeout(() => { s1.style.opacity = s2.style.opacity = "0"; base.style.transform = ""; }, 70);
+    };
+    step();
+  };
+  if (!still) {
+    const loop = () => {
+      setTimeout(() => {
+        if (!document.hidden) {
+          tear();
+          scramble(scrambles[Math.floor(Math.random() * scrambles.length)]);
+        }
+        loop();
+      }, 3500 + Math.random() * 5500);
+    };
+    setTimeout(() => { tear(); loop(); }, 1400);
+  }
+
+  // Near Wild Heaven render: still frame at once; the 0.5MB loop loads after the page is done.
+  // If the video can't play in this viewer, a small GIF of the same loop takes its place.
+  const orbit = document.getElementById("orbit");
+  const toGif = () => {
+    if (!orbit.isConnected) return;
+    const img = new Image();
+    img.src = "brand/nwh-rotate-small.gif";
+    img.alt = "Near Wild Heaven";
+    img.width = 112; img.height = 64;
+    orbit.replaceWith(img);
+  };
+  if (!still) {
+    const startOrbit = () => {
+      orbit.addEventListener("error", toGif, { once: true });
+      orbit.src = "brand/nwh-rotate.mp4";
+      const p = orbit.play();
+      if (p && p.catch) p.catch(toGif);
+      setTimeout(() => { if (orbit.isConnected && (orbit.paused || orbit.readyState < 2)) toGif(); }, 4000);
+    };
+    if (document.readyState === "complete") setTimeout(startOrbit, 300);
+    else addEventListener("load", () => setTimeout(startOrbit, 300), { once: true });
+  }
+</script>
+
+</body>
+</html>
