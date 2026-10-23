@@ -73,7 +73,6 @@
   .muted { color: var(--ink-muted); }
   .g { font-family: var(--glyph); color: var(--ink-muted); }
 
-  @keyframes blink { 50% { opacity: 0; } }
 
   /* header */
   header { display: grid; gap: 24px; }
@@ -81,6 +80,12 @@
   .wm { position: relative; flex: 1 1 auto; min-width: 0; max-width: 520px; }
   .wm img { display: block; width: 100%; height: auto; }
   .wm .slice { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  .wm img { transform-origin: 50% 50%; }
+  .wm .flip {
+    position: absolute; left: 0; top: 50%; transform-origin: 0 50%;
+    font: 700 10px/1 var(--mono); text-transform: uppercase; white-space: pre; color: var(--ink);
+    opacity: 0; pointer-events: none;
+  }
   .orbit { flex: 0 0 auto; display: block; line-height: 0; }
   .orbit:hover { background: none; }
   .orbit video, .orbit img { display: block; width: 112px; height: 64px; object-fit: cover; background: var(--ground); }
@@ -102,7 +107,7 @@
     cursor: default;
   }
   h2 .g { letter-spacing: 0; font-weight: 400; }
-  h2 .under { animation: blink 1.05s steps(1) infinite; color: var(--ink-muted); margin-left: -1.2ch; letter-spacing: 0; }
+  h2 .under { color: var(--ink-muted); margin-left: -1.2ch; letter-spacing: 0; }
   h2::after { content: ""; flex: 1; border-top: 1px dashed var(--line); margin-left: 1ch; }
 
   /* plain-text tables: fixed character columns so headers and rows line up, one line per row */
@@ -146,6 +151,8 @@
         <img src="brand/keyspan-wordmark-white.svg" alt="Keyspan" width="1610" height="143">
         <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
         <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
+        <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
+        <span class="flip" aria-hidden="true"></span>
       </div>
       <a class="orbit" href="https://www.instagram.com/near.wild.heaven_/" target="_blank" rel="noopener" title="Near Wild Heaven">
         <video id="orbit" muted loop playsinline autoplay preload="none" poster="brand/nwh-rotate-poster.png" aria-label="Near Wild Heaven" width="112" height="64"></video>
@@ -297,35 +304,120 @@
   for (const el of document.querySelectorAll("h2 [data-scramble]")) scramble(el);
   for (const el of scrambles) (el.closest("h2, .year") || el).addEventListener("mouseenter", () => scramble(el));
 
-  // bad-signal tear on the wordmark: two slices jump sideways for a moment
+  // Wordmark interference. Six kinds of signal damage, picked at random on an irregular rhythm:
+  // tear (bands jump sideways), flip (the logo drops to block glyphs that resolve into KEYSPAN),
+  // interlace (odd and even lines split apart), hold (vertical hold slips), echo (ghost copies trail),
+  // melt (the shapes smear and re-sharpen).
   const wm = document.getElementById("wm");
-  const [base, s1, s2] = wm.querySelectorAll("img");
-  const tear = () => {
-    const band = () => { const a = Math.random() * 70; return `inset(${a}% 0 ${Math.max(0, 100 - a - (8 + Math.random() * 22))}% 0)`; };
-    let n = 0;
-    const step = () => {
-      for (const s of [s1, s2]) {
-        s.style.clipPath = band();
-        s.style.transform = `translateX(${(Math.random() - 0.5) * 28}px)`;
-        s.style.opacity = "1";
-      }
-      base.style.transform = `translateX(${(Math.random() - 0.5) * 6}px)`;
-      if (++n < 5) setTimeout(step, 50 + Math.random() * 60);
-      else setTimeout(() => { s1.style.opacity = s2.style.opacity = "0"; base.style.transform = ""; }, 70);
-    };
-    step();
+  const [base, ...clones] = wm.querySelectorAll("img");
+  const flip = wm.querySelector(".flip");
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const reset = () => {
+    for (const el of [base, ...clones]) { el.style.cssText = ""; }
+    flip.style.opacity = "0";
   };
+  const band = (min = 6, max = 26) => { const a = rnd(0, 80); return `inset(${a}% 0 ${Math.max(0, 100 - a - rnd(min, max))}% 0)`; };
+
+  const FX = {
+    async tear() {
+      for (let n = 0; n < 5; n++) {
+        clones.forEach((c, k) => {
+          c.style.clipPath = band();
+          c.style.transform = `translateX(${rnd(-1, 1) * (10 + k * 10)}px)`;
+          c.style.opacity = "1";
+        });
+        base.style.transform = `translateX(${rnd(-3, 3)}px)`;
+        await sleep(rnd(45, 95));
+      }
+    },
+    async flip() {
+      const word = "KEYSPAN";
+      const h = base.clientHeight, w = base.clientWidth;
+      flip.style.fontSize = `${h / 0.72}px`;
+      flip.textContent = word;
+      const sx = w / flip.scrollWidth;
+      base.style.opacity = "0";
+      flip.style.opacity = "1";
+      const total = 12;
+      for (let f = 0; f <= total; f++) {
+        const solid = Math.floor((f / total) * word.length);
+        flip.textContent = [...word].map((ch, i) => (i < solid && Math.random() > 0.15 ? ch : NOISE[Math.floor(Math.random() * NOISE.length)])).join("");
+        flip.style.transform = `translateY(-50%) scaleX(${sx}) translateX(${rnd(-2, 2)}px)`;
+        await sleep(f === total ? 260 : 55);
+      }
+      for (let n = 0; n < 3; n++) {
+        flip.style.opacity = n % 2 ? "1" : "0";
+        base.style.opacity = n % 2 ? "0" : "1";
+        await sleep(50);
+      }
+    },
+    async interlace() {
+      const lines = Math.round(rnd(3, 7));
+      const m = `repeating-linear-gradient(to bottom, #000 0 ${lines}px, transparent ${lines}px ${lines * 2}px)`;
+      const m2 = `repeating-linear-gradient(to bottom, transparent 0 ${lines}px, #000 ${lines}px ${lines * 2}px)`;
+      base.style.opacity = "0";
+      const [a, b] = clones;
+      a.style.webkitMaskImage = a.style.maskImage = m;
+      b.style.webkitMaskImage = b.style.maskImage = m2;
+      a.style.opacity = b.style.opacity = "1";
+      for (let n = 0; n < 6; n++) {
+        const d = rnd(4, 16);
+        a.style.transform = `translateX(${d}px)`;
+        b.style.transform = `translateX(${-d}px)`;
+        await sleep(55);
+      }
+    },
+    async hold() {
+      for (let n = 0; n < 4; n++) {
+        base.style.transform = `translateY(${rnd(-14, 14)}px) scaleY(${rnd(0.35, 1.25)})`;
+        const c = clones[0];
+        c.style.clipPath = band(10, 30);
+        c.style.transform = `translateY(${rnd(-30, 30)}px)`;
+        c.style.opacity = "0.8";
+        await sleep(rnd(50, 90));
+      }
+    },
+    async echo() {
+      clones.forEach((c, k) => { c.style.opacity = String(0.45 - k * 0.12); });
+      for (let n = 0; n < 8; n++) {
+        clones.forEach((c, k) => { c.style.transform = `translateX(${(k + 1) * rnd(6, 14) * (n % 2 ? 1 : -1)}px)`; });
+        await sleep(45);
+      }
+    },
+    async melt() {
+      for (let n = 0; n < 5; n++) {
+        base.style.filter = `blur(${rnd(1, 3.5)}px) contrast(${rnd(3, 8)})`;
+        base.style.transform = `scaleX(${rnd(1, 1.06)}) skewX(${rnd(-8, 8)}deg)`;
+        await sleep(60);
+      }
+    },
+  };
+  const NAMES = Object.keys(FX);
+  let fxBusy = false;
+  const interfere = async (name = NAMES[Math.floor(Math.random() * NAMES.length)]) => {
+    if (fxBusy) return;
+    fxBusy = true;
+    try {
+      await FX[name]();
+      // sometimes a second, different hit follows straight on
+      if (Math.random() < 0.3) { reset(); await sleep(rnd(60, 160)); await FX[NAMES[Math.floor(Math.random() * NAMES.length)]](); }
+    } finally { reset(); fxBusy = false; }
+  };
+  wm.addEventListener("mouseenter", () => interfere());
   if (!still) {
     const loop = () => {
+      // mostly short gaps, now and then a long quiet stretch
+      const wait = Math.random() < 0.2 ? rnd(9000, 16000) : rnd(2200, 7000);
       setTimeout(() => {
         if (!document.hidden) {
-          tear();
-          scramble(scrambles[Math.floor(Math.random() * scrambles.length)]);
+          interfere();
+          if (Math.random() < 0.5) scramble(scrambles[Math.floor(Math.random() * scrambles.length)]);
         }
         loop();
-      }, 3500 + Math.random() * 5500);
+      }, wait);
     };
-    setTimeout(() => { tear(); loop(); }, 1400);
+    setTimeout(() => { interfere("flip"); loop(); }, 1200);
   }
 
   // Near Wild Heaven render: still frame at once; the 0.5MB loop loads after the page is done.
