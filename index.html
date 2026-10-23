@@ -76,9 +76,22 @@
 
   /* header */
   header { display: grid; gap: 24px; }
-  .top { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-  .wm { position: relative; flex: 1 1 auto; min-width: 0; max-width: 520px; }
+  .top { display: flex; align-items: center; gap: 24px; padding-block: 18px; }
+  /* Wordmark over the Near Wild Heaven render: the render plays smooth behind and around the letters;
+     the letters are solid white with the render showing through them as black 1-bit dither dots. */
+  .wm { position: relative; flex: 1 1 auto; min-width: 0; max-width: 520px; isolation: isolate; }
   .wm img { display: block; width: 100%; height: auto; }
+  .wm .sizer { visibility: hidden; }
+  .wm .orb {
+    position: absolute; left: 50%; top: 50%; z-index: -1;
+    width: auto; height: 260%; aspect-ratio: 16 / 9; max-width: none;
+    transform: translate(-50%, -50%); object-fit: cover; pointer-events: none;
+  }
+  .wm .mark {
+    position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated;
+    -webkit-mask: url(brand/keyspan-wordmark-white.svg) center / 100% 100% no-repeat;
+    mask: url(brand/keyspan-wordmark-white.svg) center / 100% 100% no-repeat;
+  }
   .wm .slice { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
   .wm img { transform-origin: 50% 50%; }
   .wm .static {
@@ -87,9 +100,6 @@
     -webkit-mask: url(brand/keyspan-wordmark-white.svg) center / 100% 100% no-repeat;
     mask: url(brand/keyspan-wordmark-white.svg) center / 100% 100% no-repeat;
   }
-  .orbit { flex: 0 0 auto; display: block; line-height: 0; }
-  .orbit:hover { background: none; }
-  .orbit video, .orbit img { display: block; width: 112px; height: 64px; object-fit: cover; background: var(--ground); }
 
   .kv { display: grid; }
   .kv p { margin: 0; display: grid; grid-template-columns: 9ch 2ch 1fr; }
@@ -137,7 +147,6 @@
   @media (max-width: 640px) {
     :root { --size: 12px; }
     .page { padding-block: 28px 40px; gap: 52px; }
-    .orbit video, .orbit img { width: 84px; height: 48px; }
     .row { grid-template-columns: 8ch minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 1.5ch; }
     .releases .row { grid-template-columns: 4ch minmax(0, 1.6fr) minmax(0, 1fr); }
     .kv p { grid-template-columns: 8ch 2ch 1fr; }
@@ -158,15 +167,14 @@
   <header>
     <div class="top">
       <div class="wm" id="wm">
-        <img src="brand/keyspan-wordmark-white.svg" alt="Keyspan" width="1610" height="143">
+        <video class="orb" id="orbit" muted loop playsinline autoplay preload="none" poster="brand/nwh-rotate-poster.png" aria-hidden="true"></video>
+        <img class="sizer" src="brand/keyspan-wordmark-white.svg" alt="Keyspan" width="1610" height="143">
+        <canvas class="mark" id="mark" aria-hidden="true"></canvas>
         <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
         <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
         <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
         <canvas class="static" aria-hidden="true"></canvas>
       </div>
-      <a class="orbit" href="https://www.instagram.com/near.wild.heaven_/" target="_blank" rel="noopener" title="Near Wild Heaven">
-        <video id="orbit" muted loop playsinline autoplay preload="none" poster="brand/nwh-rotate-poster.png" aria-label="Near Wild Heaven" width="112" height="64"></video>
-      </a>
     </div>
     <div class="kv">
       <p><span class="k">listen</span><span class="sep">|</span><span class="v"><a href="https://www.instagram.com/keyspan_/" target="_blank" rel="noopener">ig</a><a href="https://open.spotify.com/artist/3Q4CXWHBChhLfoBxYj80tL" target="_blank" rel="noopener">spotify</a><a href="https://soundcloud.com/keyspan" target="_blank" rel="noopener">soundcloud</a></span></p>
@@ -318,7 +326,8 @@
   // tear (sync loss bends horizontal bands), interlace (fine line jitter), static (snow inside the letters),
   // roll (vertical hold slips), flicker (signal fades and returns), ghost (a faint echo beside the image).
   const wm = document.getElementById("wm");
-  const [base, ...clones] = wm.querySelectorAll("img");
+  const base = document.getElementById("mark");
+  const clones = [...wm.querySelectorAll("img.slice")];
   const snow = wm.querySelector(".static");
   const snowCtx = snow.getContext("2d");
   const tvNoise = document.getElementById("tvNoise");
@@ -404,29 +413,72 @@
     setTimeout(() => { interfere("tear"); loop(); }, 1400);
   }
 
-  // Near Wild Heaven render: still frame at once; the 0.5MB loop loads after the page is done.
-  // It plays even with reduced motion on: a slow 32s turn, small, and part of the identity.
-  // If the video can't play in this viewer, a small GIF of the same loop takes its place.
-  const orbit = document.getElementById("orbit");
+  // Near Wild Heaven render behind the wordmark: still frame at once; the 0.5MB loop loads after the page is done.
+  // It plays even with reduced motion on. If the video can't play in this viewer, a small GIF of the same loop
+  // takes its place. Each frame is also dithered into the letters.
+  let orbit = document.getElementById("orbit");
+  const poster = new Image();
+  poster.src = "brand/nwh-rotate-poster.png";
   const toGif = () => {
-    if (!orbit.isConnected) return;
+    if (orbit.tagName !== "VIDEO" || !orbit.isConnected) return;
     const img = new Image();
     img.src = "brand/nwh-rotate-small.gif";
-    img.alt = "Near Wild Heaven";
-    img.width = 112; img.height = 64;
+    img.className = "orb";
+    img.alt = "";
     orbit.replaceWith(img);
+    orbit = img;
   };
-  {
-    const startOrbit = () => {
-      orbit.addEventListener("error", toGif, { once: true });
-      orbit.src = "brand/nwh-rotate.mp4";
-      const p = orbit.play();
-      if (p && p.catch) p.catch(toGif);
-      setTimeout(() => { if (orbit.isConnected && (orbit.paused || orbit.readyState < 2)) toGif(); }, 4000);
-    };
-    if (document.readyState === "complete") setTimeout(startOrbit, 300);
-    else addEventListener("load", () => setTimeout(startOrbit, 300), { once: true });
-  }
+  const startOrbit = () => {
+    orbit.addEventListener("error", toGif, { once: true });
+    orbit.src = "brand/nwh-rotate.mp4";
+    const p = orbit.play();
+    if (p && p.catch) p.catch(toGif);
+    setTimeout(() => { if (orbit.tagName === "VIDEO" && (orbit.paused || orbit.readyState < 2)) toGif(); }, 4000);
+  };
+  if (document.readyState === "complete") setTimeout(startOrbit, 300);
+  else addEventListener("load", () => setTimeout(startOrbit, 300), { once: true });
+
+  const mark = base;
+  const mctx = mark.getContext("2d", { willReadFrequently: true });
+  const CELL = 2;   // CSS pixels per dither dot
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + 0.5) * 16);
+  const orbSource = () => {
+    if (orbit.tagName === "VIDEO") return orbit.readyState >= 2 ? orbit : (poster.complete && poster.naturalWidth ? poster : null);
+    return orbit.complete && orbit.naturalWidth ? orbit : null;
+  };
+  const drawMark = () => {
+    const box = wm.getBoundingClientRect();
+    const w = Math.max(8, Math.round(box.width / CELL)), h = Math.max(4, Math.round(box.height / CELL));
+    if (mark.width !== w || mark.height !== h) { mark.width = w; mark.height = h; }
+    mctx.fillStyle = "#000";
+    mctx.fillRect(0, 0, w, h);
+    const src = orbSource();
+    if (src) {
+      const r = orbit.getBoundingClientRect();
+      const sw = src.videoWidth || src.naturalWidth, sh = src.videoHeight || src.naturalHeight;
+      const scale = Math.max(r.width / sw, r.height / sh);
+      const dw = sw * scale / CELL, dh = sh * scale / CELL;
+      const cx = (r.left + r.width / 2 - box.left) / CELL, cy = (r.top + r.height / 2 - box.top) / CELL;
+      mctx.drawImage(src, cx - dw / 2, cy - dh / 2, dw, dh);
+    }
+    const img = mctx.getImageData(0, 0, w, h);
+    const d = img.data;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const l = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114 - 18) * 1.7;
+        const v = l > BAYER[(y & 3) * 4 + (x & 3)] ? 0 : 255;   // inverted: chrome becomes black dots on white
+        d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+      }
+    }
+    mctx.putImageData(img, 0, 0);
+  };
+  let lastMark = 0;
+  const markLoop = t => {
+    if (t - lastMark > 1000 / 24) { lastMark = t; drawMark(); }
+    requestAnimationFrame(markLoop);
+  };
+  requestAnimationFrame(markLoop);
 </script>
 
 </body>
