@@ -42,6 +42,7 @@
     font: 400 var(--size)/var(--lh) var(--mono);
     text-transform: lowercase;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;   /* the render behind the wordmark may reach past the edge on phones; never scroll sideways */
   }
   ::selection { background: var(--ink); color: var(--ground); }
 
@@ -76,15 +77,15 @@
 
   /* header */
   header { display: grid; gap: 24px; }
-  .top { display: flex; align-items: center; gap: 24px; padding-block: 18px; overflow-x: clip; }
-  /* Wordmark over the Near Wild Heaven render (centred near the right end of the word): the render plays
+  .top { display: flex; align-items: center; gap: 24px; padding-block: 18px; }
+  /* Wordmark over the Near Wild Heaven render (centred under the K): the render plays
      smooth behind and around the letters;
      the letters are solid white with the render showing through them as black 1-bit dither dots. */
   .wm { position: relative; flex: 1 1 auto; min-width: 0; max-width: 520px; isolation: isolate; }
   .wm img { display: block; width: 100%; height: auto; }
   .wm .sizer { visibility: hidden; }
   .wm .orb {
-    position: absolute; left: 86%; top: 50%; z-index: -1;
+    position: absolute; left: 8%; top: 50%; z-index: -1;
     width: auto; height: 260%; aspect-ratio: 16 / 9; max-width: none;
     transform: translate(-50%, -50%); object-fit: cover; pointer-events: none;
   }
@@ -168,7 +169,7 @@
   <header>
     <div class="top">
       <div class="wm" id="wm">
-        <video class="orb" id="orbit" muted loop playsinline autoplay preload="none" poster="brand/nwh-rotate-poster.png" aria-hidden="true"></video>
+        <video class="orb" id="orbit" muted loop playsinline autoplay preload="none" poster="brand/nwh-orbit-still.jpg" aria-hidden="true"></video>
         <img class="sizer" src="brand/keyspan-wordmark-white.svg" alt="Keyspan" width="1610" height="143">
         <canvas class="mark" id="mark" aria-hidden="true"></canvas>
         <img class="slice" src="brand/keyspan-wordmark-white.svg" alt="" aria-hidden="true">
@@ -414,12 +415,13 @@
     setTimeout(() => { interfere("tear"); loop(); }, 1400);
   }
 
-  // Near Wild Heaven render behind the wordmark: still frame at once; the 0.5MB loop loads after the page is done.
+  // Near Wild Heaven render behind the wordmark: still frame at once; the 2.8MB loop (same file as nearwildheaven.org)
+  // loads after the page is done.
   // It plays even with reduced motion on. If the video can't play in this viewer, a small GIF of the same loop
   // takes its place. Each frame is also dithered into the letters.
   let orbit = document.getElementById("orbit");
   const poster = new Image();
-  poster.src = "brand/nwh-rotate-poster.png";
+  poster.src = "brand/nwh-orbit-still.jpg";
   const toGif = () => {
     if (orbit.tagName !== "VIDEO" || !orbit.isConnected) return;
     const img = new Image();
@@ -431,10 +433,10 @@
   };
   const startOrbit = () => {
     orbit.addEventListener("error", toGif, { once: true });
-    orbit.src = "brand/nwh-rotate.mp4";
+    orbit.src = "brand/nwh-orbit.mp4";
     const p = orbit.play();
     if (p && p.catch) p.catch(toGif);
-    setTimeout(() => { if (orbit.tagName === "VIDEO" && (orbit.paused || orbit.readyState < 2)) toGif(); }, 4000);
+    setTimeout(() => { if (orbit.tagName === "VIDEO" && orbit.paused && orbit.readyState >= 1) toGif(); }, 8000);
   };
   if (document.readyState === "complete") setTimeout(startOrbit, 300);
   else addEventListener("load", () => setTimeout(startOrbit, 300), { once: true });
