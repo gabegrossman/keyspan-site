@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" href="brand/nwh-mark-white.png">
+<link rel="icon" href="brand/keyspan-k-icon.svg" type="image/svg+xml">
 <meta property="og:title" content="Keyspan">
 <meta property="og:description" content="Resident at Sound + Spotlight. Selected shows, recordings, releases, booking.">
 <meta property="og:image" content="https://keyspan.org/brand/nwh-rotate-poster.png">
@@ -76,14 +76,15 @@
 
   /* header */
   header { display: grid; gap: 24px; }
-  .top { display: flex; align-items: center; gap: 24px; padding-block: 18px; }
-  /* Wordmark over the Near Wild Heaven render: the render plays smooth behind and around the letters;
+  .top { display: flex; align-items: center; gap: 24px; padding-block: 18px; overflow-x: clip; }
+  /* Wordmark over the Near Wild Heaven render (centred near the right end of the word): the render plays
+     smooth behind and around the letters;
      the letters are solid white with the render showing through them as black 1-bit dither dots. */
   .wm { position: relative; flex: 1 1 auto; min-width: 0; max-width: 520px; isolation: isolate; }
   .wm img { display: block; width: 100%; height: auto; }
   .wm .sizer { visibility: hidden; }
   .wm .orb {
-    position: absolute; left: 50%; top: 50%; z-index: -1;
+    position: absolute; left: 86%; top: 50%; z-index: -1;
     width: auto; height: 260%; aspect-ratio: 16 / 9; max-width: none;
     transform: translate(-50%, -50%); object-fit: cover; pointer-events: none;
   }
