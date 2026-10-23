@@ -128,11 +128,6 @@
   footer a:hover { background: none; opacity: 0.6; }
   footer .g { font-size: 12px; letter-spacing: 0.2em; }
 
-  @media (prefers-reduced-motion: reduce) {
-    body::after, h2 .under { animation: none; }
-    body::after { display: none; }
-  }
-
   @media (max-width: 640px) {
     :root { --size: 12px; }
     .page { padding-block: 28px 40px; gap: 52px; }
@@ -199,7 +194,8 @@
 
 <script>
   const SC = "https://soundcloud.com/keyspan/";
-  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Effects run for everyone, including viewers with reduced motion on: they are part of the identity.
+  const still = false;
 
   // [date, event, venue, recording url, key show?]
   // Square brackets in the event name mark it as a description, not an artist.
