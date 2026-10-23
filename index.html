@@ -342,7 +342,7 @@
       const total = 12;
       for (let f = 0; f <= total; f++) {
         const solid = Math.floor((f / total) * word.length);
-        flip.textContent = [...word].map((ch, i) => (i < solid && Math.random() > 0.15 ? ch : NOISE[Math.floor(Math.random() * NOISE.length)])).join("");
+        flip.textContent = [...word].map((ch, i) => (i < solid && (f === total || Math.random() > 0.15) ? ch : NOISE[Math.floor(Math.random() * NOISE.length)])).join("");
         flip.style.transform = `translateY(-50%) scaleX(${sx}) translateX(${rnd(-2, 2)}px)`;
         await sleep(f === total ? 260 : 55);
       }
